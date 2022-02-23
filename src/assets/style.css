@@ -1,0 +1,25 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* .el-loading-spinner .circular {
+    width: 42px;
+    height: 42px;
+    animation: loading-rotate 2s linear infinite;
+    display: none;
+}
+
+.el-loading-spinner {
+    background: url(../assets/1.gif) 50% 50% no-repeat rgba(0, 0, 0, 0.7);
+    background-size: 100px 88px;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+} */
