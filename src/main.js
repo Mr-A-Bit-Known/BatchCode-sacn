@@ -7,16 +7,17 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import axios from 'axios'
 import '../src/assets/style.css'
-import printTemplate from '../src/components/printTemplate'
-import printService from 'vue-ueditor-wrap'
+import print from 'vue-print-nb'
+import VueBarcode from "vue-barcode";
 
-Vue.config.productionTip = false
-Vue.component('Vue-print', printTemplate);
-Vue.component('vue-ueditor-wrap', printService);
+Vue.use(print);
+Vue.config.productionTip = false;
 
 
-Vue.use(ElementUI)
-Vue.prototype.$axios = axios
+Vue.use(ElementUI);
+Vue.component("barcode", VueBarcode);
+Vue.prototype.$axios = axios;
+
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 
