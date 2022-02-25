@@ -12,7 +12,9 @@
               @keyup.enter.native="scan"
               v-loading.fullscreen.lock="fullscreenLoading"
             ></el-input>
-            <el-button type="primary" @click="scan">确定</el-button>
+            <el-button type="primary" icon="el-icon-search" @click="scan"
+              >确定</el-button
+            >
           </div>
         </div>
         <div class="print_review_wrapper">
@@ -42,10 +44,15 @@
                 />
                 <el-table-column
                   prop="customerProductModel"
+                  label="客户产品型号"
+                  width="220px"
+                />
+                <el-table-column
+                  prop="customerProductModel"
                   label="客户产品名称"
                   width="250px"
                 />
-                <el-table-column prop="Label" label="产品型号" width="250px" />
+                <el-table-column v-if="showLabel" prop="Label" label="产品型号" width="250px" />
                 <el-table-column
                   prop="StandardQty"
                   label="标准数量"
@@ -56,9 +63,99 @@
               <div class="vue-print" v-if="showPrint">
                 <el-card class="print_content">
                   <div id="vuePrint" class="vuePrintStyle">
-                   <div style="width:200px;height:60px;display:flex">
-                     <label>工作令:</label> <barcode :value="this.workOrderCode" />
-                   </div>
+                    <div class="print_area">
+                      <div class="bar_style">
+                        <div class="font_style">
+                          WorkOrderCode:{{ this.workOrderCode }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.workOrderCode"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          :displayValue="false"
+                        />
+                      </div>
+                      <div class="bar_style">
+                        <div class="font_style">
+                          BatchCode:{{ this.batchCode }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.batchCode"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          displayValue="false"
+                        />
+                      </div>
+                      <div class="bar_style">
+                        <div class="font_style">
+                          CustomerOrderCode:{{ this.customerOrderCode }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.customerOrderCode"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          displayValue="false"
+                        />
+                      </div>
+                      <div class="bar_style">
+                        <div class="font_style">
+                          NowQty:{{ this.nowQty }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.nowQty"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          displayValue="false"
+                        />
+                      </div>
+                      <div class="bar_style">
+                        <div class="font_style">
+                          CustomerProductModel:{{ this.customerProductModel }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.customerProductModel"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          displayValue="false"
+                        />
+                      </div>
+                      <div class="bar_style" v-if="showLabel">
+                        <div class="font_style">
+                          Label:{{ this.label }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.label"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          displayValue="false"
+                        />
+                      </div>
+                      <div class="bar_style" v-if="showTable">
+                        <div class="font_style">
+                          StandardQty:{{ this.standardQty }}
+                        </div>
+                        <barcode
+                          class="barcode_style"
+                          :value="this.standardQty"
+                          width="2"
+                          height="25"
+                          margin="0"
+                          displayValue="false"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </el-card>
               </div>
@@ -67,7 +164,13 @@
         </div>
         <div class="bottom_wrapper">
           <div class="bottom_content">
-            <el-button type="primary" v-print="'#vuePrint'">快速打印</el-button>
+            <el-button
+              type="primary"
+              v-print="'#vuePrint'"
+              :disabled="this.showButton"
+              icon="el-icon-document"
+              >快速打印</el-button
+            >
           </div>
         </div>
       </el-main>
@@ -99,20 +202,33 @@ export default {
       screenHeight: "",
       //   loading
       fullscreenLoading: false,
+      // 空状态
       showEmpty: true,
+      // 表格状态
       tableShow: false,
+      // 打印状态
       showPrint: false,
+      // 表格内容是否存在判断
       showTable: true,
+      // 打印按钮状态
+      showButton: true,
+      // label状态
+      showLabel: true,
       //   input
       data_list: [
         {
           inputValue: null,
         },
       ],
+
       // 条形码转换
       workOrderCode: "",
       batchCode: "",
-      customerOrderCode:"",
+      customerOrderCode: "",
+      label:"",
+      nowQty:"",
+      standardQty:"",
+      customerProductModel: "",
       // 遍历获取的数组对象
       bar: "",
       // 遍历数组接收对象
@@ -188,10 +304,23 @@ export default {
               this.batchCode = item.BatchCode;
               // 条形码转换
               this.customerOrderCode = item.CustomerOrderCode;
+              // 条形码转换
+              this.label = item.Label;
+              // 条形码转换
+              this.nowQty = item.NowQty;
+              // 条形码转换
+              this.standardQty = item.StandardQty;
+              // 条形码转换
+              this.customerProductModel = item.customerProductModel;
               if (item.StandardQty == null) {
                 this.showTable = false;
               } else {
                 this.showTable = true;
+              }
+              if (item.Label == "") {
+                this.showLabel = false;
+              }else {
+                this.showLabel = true;
               }
             }
             this.$message({
@@ -217,7 +346,7 @@ export default {
             this.data_list.inputValue = "";
             this.print_review_info = "";
             this.$message({
-              message: `<strong><i>该组装批不存在...</i></strong>`,
+              message: `<strong><i>组装批不存在...</i></strong>`,
               // html元素
               dangerouslyUseHTMLString: true,
               // 关闭按钮开启d
@@ -231,6 +360,17 @@ export default {
             });
           }
         });
+    },
+  },
+  // 监听
+  watch: {
+    // 处理打印按钮何时能被使用
+    showPrint: function (value) {
+      if (value == true) {
+        this.showButton = false;
+      } else {
+        this.showButton = true;
+      }
     },
   },
   mounted() {
@@ -282,11 +422,11 @@ export default {
   display: flex;
   justify-content: center;
   margin-top: 50px;
-  width: 1300px;
+  width: 1600px;
   height: 500px;
 }
 .el-table {
-  width: 1220px !important;
+  width: 1450px !important;
 }
 .bottom_wrapper {
   margin-top: 50px;
@@ -294,12 +434,12 @@ export default {
   justify-content: center;
 }
 .bottom_content {
-  width: 1300px;
+  width: 1600px;
   display: flex;
   justify-content: flex-end;
 }
 .vue-print {
-  margin-top: 60px;
+  margin-top: 40px;
   display: flex;
   justify-content: center;
 }
@@ -316,10 +456,26 @@ export default {
 }
 .vuePrintStyle {
   width: 8cm;
-  height: 4cm;
+  height: 4.5cm;
 }
-.vuePrintStyle >>> .vue-barcode-element {
-  width: 220px;
-  height: 60px;
+.barcode_style {
+  height: 30px;
+  line-height: 30px;
+}
+.print_area {
+  width: 12cm !important;
+  flex-direction: column;
+}
+.barcode_item {
+  line-height: 30px;
+}
+.font_style {
+  font-size: 14px;
+  text-align: left;
+}
+.bar_style {
+  display: inline;
+  flex-direction: column;
+  margin-top: 10px;
 }
 </style>
