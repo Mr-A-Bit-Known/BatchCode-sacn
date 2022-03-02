@@ -8,7 +8,17 @@ import 'element-ui/lib/theme-chalk/index.css'
 import axios from 'axios'
 import '../src/assets/style.css'
 import print from 'vue-print-nb'
-import VueBarcode from "vue-barcode";
+import VueBarcode from "vue-barcode"
+
+
+import quillEditer from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+Vue.use(quillEditer);
+
+import Footer from '../src/views/Footer'
 
 Vue.use(print);
 Vue.config.productionTip = false;
@@ -16,6 +26,7 @@ Vue.config.productionTip = false;
 
 Vue.use(ElementUI);
 Vue.component("barcode", VueBarcode);
+Vue.component('Footer', Footer);
 Vue.prototype.$axios = axios;
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
