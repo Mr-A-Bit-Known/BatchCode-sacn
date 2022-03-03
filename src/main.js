@@ -9,14 +9,7 @@ import axios from 'axios'
 import '../src/assets/style.css'
 import print from 'vue-print-nb'
 import VueBarcode from "vue-barcode"
-
-
-import quillEditer from 'vue-quill-editor'
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-
-Vue.use(quillEditer);
+import QrcodeVue from 'qrcode.vue'
 
 import Footer from '../src/views/Footer'
 
@@ -26,6 +19,7 @@ Vue.config.productionTip = false;
 
 Vue.use(ElementUI);
 Vue.component("barcode", VueBarcode);
+Vue.component("qrcode", QrcodeVue);
 Vue.component('Footer', Footer);
 Vue.prototype.$axios = axios;
 
@@ -34,12 +28,15 @@ axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded
 
 // Global width & height auto achieveible
 Vue.prototype.$getViewSize = function() {
-        return {
-            width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // width
-            height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight // height
-        }
+    return {
+        width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // width
+        height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight // height
     }
-    /* eslint-disable no-new */
+}
+
+// 条形码样式
+
+/* eslint-disable no-new */
 new Vue({
     el: '#app',
     router,

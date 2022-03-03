@@ -106,15 +106,90 @@
         :with-header="false"
         :close-on-click-modal="false"
       >
-        <div>
-          <quill-editor
-            ref="myQuillEditor"
-            @blur="onEditorBlur($event)"
-            @focus="onEditorFocus($event)"
-            @ready="onEditorReady($event)"
+        <el-card class="printCard">
+          
+          <el-card class="barView">
+            <div class="barcode_wrapper" id="barcode_wrapper">
+              <div class="barcode_left">
+                <div class="barcodeSame">
+                  <div class="barcodeContent">
+                    <div class="barcodeDiscription">
+                      PO:{{ this.infoList.workOrderCode }}
+                    </div>
+                    <barcode
+                      :value="this.infoList.workOrderCode"
+                      :displayValue="false"
+                      :height="50"
+                    />
+                  </div>
+                </div>
+                <div class="barcodeSame anotherStyle">
+                  <div class="barcodeContent">
+                    <div class="barcodeDiscription">
+                      MPN:{{ this.infoList.label }}
+                    </div>
+                    <barcode
+                      :value="this.infoList.Label"
+                      :displayValue="false"
+                      :height="50"
+                    />
+                  </div>
+                </div>
+                <div class="barcodeSame anotherStyle">
+                  <div class="barcodeContent">
+                    <div class="barcodeDiscription">
+                      M.LOT:{{ this.infoList.batchCode }}
+                    </div>
+                    <barcode
+                      :value="this.infoList.BatchCode"
+                      :displayValue="false"
+                      :height="50"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <div class="barcodeSame">
+                  <div class="barcodeContent">
+                    <div class="barcodeDiscription">
+                      M.LOT:{{ this.infoList.nowQty }}
+                    </div>
+                    <barcode
+                      :value="this.infoList.NowQty"
+                      :displayValue="false"
+                      :height="50"
+                    />
+                  </div>
+                </div>
+                <div class="qrcode_style">
+                  <qrcode :value="this.infoListGroup" />
+                </div>
+              </div>
+            </div>
+          </el-card>
+          <h3>***可修改以下参数***</h3>
+          <div class="settingPanel">
+            <div class="gridContent">
+              <p :class="{ pubFontSty: pubFontSty }">当前数量:</p>
+              <input v-model="this.infoList.nowQty" />
+            </div>
+            <div class="gridContent" v-if="this.showTable">
+              <p :class="{ pubFontSty: pubFontSty }">标准数量:</p>
+              <input v-model="this.infoList.standardQty" />
+            </div>
+            <div class="gridContent" v-if="(inputShow = false)">
+              <p :class="{ pubFontSty: pubFontSty }">Qty:</p>
+              <input type="text" />
+            </div>
+          </div>
+        </el-card>
+        <div class="printButton">
+          <el-button
+            type="primary"
+            icon="el-icon-printer"
+            v-print="'#barcode_wrapper'"
+            >打印</el-button
           >
-          <div>123</div>
-          </quill-editor>
         </div>
       </el-dialog>
     </div>
@@ -160,13 +235,15 @@ export default {
       //   input
       data_list: [
         {
-          inputValue: null,
+          inputValue: "",
         },
       ],
 
       // 显示抽屉
       drawer: false,
 
+      // 字体样式
+      pubFontSty: true,
       // 条形码转换
       infoList: [
         {
@@ -179,6 +256,8 @@ export default {
           customerProductModel: "",
         },
       ],
+      // 数据组合
+      infoListGroup: "",
       // 遍历获取的数组对象
       bar: "",
       // 遍历数组接收对象
@@ -189,12 +268,6 @@ export default {
     };
   },
   methods: {
-    // 富文本
-    onEditorReady(e) {
-      e.container.querySelector('.ql-blank').innerHTML = this.infoList
-    },
-    onEditorBlur(e) {},
-    onEditorFocus(e) {},
     //   mian container auto fixed
     getViewInfo() {
       const screenHeight = this.$getViewSize().height - 160 + "px";
@@ -271,10 +344,26 @@ export default {
               this.infoList.standardQty = item.StandardQty;
               // 条形码转换
               this.infoList.customerProductModel = item.customerProductModel;
+
               if (item.StandardQty == null) {
                 this.showTable = false;
+                // 数据组合
+                this.infoListGroup =
+                  item.CustomerOrderCode +
+                  "#" +
+                  item.customerProductModel +
+                  "#" +
+                  item.NowQty;
               } else {
                 this.showTable = true;
+                this.infoListGroup =
+                  item.CustomerOrderCode +
+                  "#" +
+                  item.customerProductModel +
+                  "#" +
+                  item.NowQty +
+                  "#" +
+                  item.StandardQty;
               }
               if (item.Label == "") {
                 this.showLabel = false;
@@ -370,12 +459,12 @@ export default {
 }
 /* 穿透样式 */
 .search_wrapper >>> .el-input__inner {
-  height: 45px !important;
+  height: 45px!important;
   border-radius: 0px;
   text-align: center;
 }
 .search_wrapper .el-button {
-  border-radius: 0px !important;
+  border-radius: 0px!important;
 }
 .print_review_wrapper {
   display: flex;
@@ -393,7 +482,7 @@ export default {
   align-items: center;
 }
 .el-table {
-  width: 1450px !important;
+  width: 1450px!important;
 }
 .bottom_wrapper {
   margin-top: 50px;
@@ -410,13 +499,6 @@ export default {
   display: flex;
   justify-content: center;
 }
-.print_content {
-  width: 12cm;
-  height: 8cm;
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: column;
-}
 @page {
   margin-top: 1mm;
   margin-bottom: 1mm;
@@ -430,7 +512,7 @@ export default {
   line-height: 30px;
 }
 .print_area {
-  width: 12cm !important;
+  width: 12cm!important;
   flex-direction: column;
 }
 .barcode_item {
@@ -440,17 +522,74 @@ export default {
   font-size: 14px;
   text-align: left;
 }
-.bar_style {
-  display: inline;
-  flex-direction: column;
+.printButton {
+  width: 100%;
+  height: 40px!important;
+  display: flex;
+  justify-content: flex-end;
   margin-top: 10px;
 }
-.dialogStyle div {
-  height: 60vh;
-  overflow: auto;
+.printCard {
+  height: 550px;
 }
-.quill-editor {
-  height: 500px !important;
-  overflow-x: hidden;
+.barView {
+  width: 100%;
+  height: 400px;
+}
+.settingPanel {
+  margin-top: 20px;
+  width: 100%;
+  height: 200px!important;
+  display: flex;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+.pubFontSty {
+  font-size: 15px;
+  font-weight: 500;
+}
+.gridContent {
+  display: flex;
+  margin-left: 10px;
+  margin-top: -70px;
+  height: 175px!important;
+  align-items: center;
+}
+.gridContent input {
+  width: 150px;
+  height: 25px;
+  outline: none;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: "Microsoft soft";
+}
+.barcode_wrapper {
+  width: 7cm;
+  height: 4.5cm;
+  display: flex;
+}
+.barcode_left {
+  display: flex;
+  flex-direction: column;
+}
+.barcodeContent {
+  display: flex;
+  flex-direction: column;
+}
+.barcodeSame {
+  height: 80px;
+}
+.anotherStyle {
+  margin-top: 10px;
+}
+.barcodeDiscription {
+  font-size: 20px;
+  margin-left: 10px;
+}
+.qrcode_style {
+  margin-left: 10px;
+  margin-top: 20px;
 }
 </style>
