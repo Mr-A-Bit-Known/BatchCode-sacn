@@ -12,6 +12,7 @@ import VueBarcode from "vue-barcode"
 import QrcodeVue from 'qrcode.vue'
 
 import Footer from '../src/views/Footer'
+import PrintDialog from '../src/views/printDialog'
 
 Vue.use(print);
 Vue.config.productionTip = false;
@@ -21,6 +22,7 @@ Vue.use(ElementUI);
 Vue.component("barcode", VueBarcode);
 Vue.component("qrcode", QrcodeVue);
 Vue.component('Footer', Footer);
+Vue.component('PrintDialog', PrintDialog);
 Vue.prototype.$axios = axios;
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';

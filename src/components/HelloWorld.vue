@@ -89,7 +89,7 @@
                 type="primary"
                 :disabled="this.showButton"
                 icon="el-icon-printer"
-                @click="drawer = true"
+                @click="showVisible"
                 >打印预览</el-button
               >
             </el-tooltip>
@@ -98,101 +98,7 @@
       </el-main>
       <el-footer :style="footer_style"><Footer /></el-footer>
     </el-container>
-    <div class="drawerWrapper">
-      <el-dialog
-        class="dialogStyle"
-        title="标签打印"
-        :visible.sync="drawer"
-        :with-header="false"
-        :close-on-click-modal="false"
-      >
-        <el-card class="printCard">
-          
-          <el-card class="barView">
-            <div class="barcode_wrapper" id="barcode_wrapper">
-              <div class="barcode_left">
-                <div class="barcodeSame">
-                  <div class="barcodeContent">
-                    <div class="barcodeDiscription">
-                      PO:{{ this.infoList.workOrderCode }}
-                    </div>
-                    <barcode
-                      :value="this.infoList.workOrderCode"
-                      :displayValue="false"
-                      :height="50"
-                    />
-                  </div>
-                </div>
-                <div class="barcodeSame anotherStyle">
-                  <div class="barcodeContent">
-                    <div class="barcodeDiscription">
-                      MPN:{{ this.infoList.label }}
-                    </div>
-                    <barcode
-                      :value="this.infoList.Label"
-                      :displayValue="false"
-                      :height="50"
-                    />
-                  </div>
-                </div>
-                <div class="barcodeSame anotherStyle">
-                  <div class="barcodeContent">
-                    <div class="barcodeDiscription">
-                      M.LOT:{{ this.infoList.batchCode }}
-                    </div>
-                    <barcode
-                      :value="this.infoList.BatchCode"
-                      :displayValue="false"
-                      :height="50"
-                    />
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div class="barcodeSame">
-                  <div class="barcodeContent">
-                    <div class="barcodeDiscription">
-                      M.LOT:{{ this.infoList.nowQty }}
-                    </div>
-                    <barcode
-                      :value="this.infoList.NowQty"
-                      :displayValue="false"
-                      :height="50"
-                    />
-                  </div>
-                </div>
-                <div class="qrcode_style">
-                  <qrcode :value="this.infoListGroup" />
-                </div>
-              </div>
-            </div>
-          </el-card>
-          <h3>***可修改以下参数***</h3>
-          <div class="settingPanel">
-            <div class="gridContent">
-              <p :class="{ pubFontSty: pubFontSty }">当前数量:</p>
-              <input v-model="this.infoList.nowQty" />
-            </div>
-            <div class="gridContent" v-if="this.showTable">
-              <p :class="{ pubFontSty: pubFontSty }">标准数量:</p>
-              <input v-model="this.infoList.standardQty" />
-            </div>
-            <div class="gridContent" v-if="(inputShow = false)">
-              <p :class="{ pubFontSty: pubFontSty }">Qty:</p>
-              <input type="text" />
-            </div>
-          </div>
-        </el-card>
-        <div class="printButton">
-          <el-button
-            type="primary"
-            icon="el-icon-printer"
-            v-print="'#barcode_wrapper'"
-            >打印</el-button
-          >
-        </div>
-      </el-dialog>
-    </div>
+    <PrintDialog v-if="isVisible" @childVisible="parentVisible" :print_review_info="this.print_review_info" />
   </div>
 </template>
 
@@ -229,7 +135,7 @@ export default {
       // 表格内容是否存在判断
       showTable: true,
       // 打印按钮状态
-      showButton: false,
+      showButton: true,
       // label状态
       showLabel: true,
       //   input
@@ -244,27 +150,17 @@ export default {
 
       // 字体样式
       pubFontSty: true,
-      // 条形码转换
-      infoList: [
-        {
-          workOrderCode: "",
-          batchCode: "",
-          customerOrderCode: "",
-          label: "",
-          nowQty: "",
-          standardQty: "",
-          customerProductModel: "",
-        },
-      ],
+
       // 数据组合
       infoListGroup: "",
       // 遍历获取的数组对象
       bar: "",
       // 遍历数组接收对象
-      print_review_info: [{}],
-      getBarCode_info: [{}],
+      print_review_info: {},
       // 剧中样式
       isAlign: true,
+      // 打印预览显示状态
+      isVisible: false,
     };
   },
   methods: {
@@ -272,6 +168,13 @@ export default {
     getViewInfo() {
       const screenHeight = this.$getViewSize().height - 160 + "px";
       this.screenHeight = screenHeight;
+    },
+    // 是否显示遮罩层
+    showVisible() {
+      this.isVisible = true;
+    },
+    parentVisible(ishowing) {
+      this.isVisible = ishowing;
     },
     //  scan
     scan() {
@@ -330,21 +233,6 @@ export default {
             for (const item of result) {
               this.bar = item.BatchCode;
               this.barList = item;
-              // 条形码转换
-              this.infoList.workOrderCode = item.WorkOrderCode;
-              // 条形码转换
-              this.infoList.batchCode = item.BatchCode;
-              // 条形码转换
-              this.infoList.customerOrderCode = item.CustomerOrderCode;
-              // 条形码转换
-              this.infoList.label = item.Label;
-              // 条形码转换
-              this.infoList.nowQty = item.NowQty;
-              // 条形码转换
-              this.infoList.standardQty = item.StandardQty;
-              // 条形码转换
-              this.infoList.customerProductModel = item.customerProductModel;
-
               if (item.StandardQty == null) {
                 this.showTable = false;
                 // 数据组合
@@ -365,7 +253,7 @@ export default {
                   "#" +
                   item.StandardQty;
               }
-              if (item.Label == "") {
+              if (item.Label == null) {
                 this.showLabel = false;
               } else {
                 this.showLabel = true;
@@ -395,6 +283,28 @@ export default {
             this.print_review_info = "";
             this.$message({
               message: `<strong><i>"${this.data_list.inputValue}"不存在...</i></strong>`,
+              // html元素
+              dangerouslyUseHTMLString: true,
+              // 关闭按钮开启d
+              showClose: true,
+              // 问名字是否居中
+              center: true,
+              // 文字提示类型
+              type: "error",
+              // 显示时间
+              duration: 2000,
+            });
+            this.data_list.inputValue = "";
+          } else if (status == 403) {
+            this.isAlign = true;
+            if (document.getElementsByClassName("el-message").length > 1)
+              return;
+            this.showEmpty = res.data.showEmpty;
+            this.tableShow = res.data.tableShow;
+            this.showPrint = res.data.showPrint;
+            this.print_review_info = "";
+            this.$message({
+              message: `<strong><i>输入类型无法预知错误...</i></strong>`,
               // html元素
               dangerouslyUseHTMLString: true,
               // 关闭按钮开启d
@@ -459,12 +369,12 @@ export default {
 }
 /* 穿透样式 */
 .search_wrapper >>> .el-input__inner {
-  height: 45px!important;
+  height: 45px !important;
   border-radius: 0px;
   text-align: center;
 }
 .search_wrapper .el-button {
-  border-radius: 0px!important;
+  border-radius: 0px !important;
 }
 .print_review_wrapper {
   display: flex;
@@ -475,14 +385,14 @@ export default {
   justify-content: center;
   margin-top: 50px;
   width: 1600px;
-  height: 500px;
+  /* height: 500px; */
 }
 /* 动态居中样式 */
 .isAlign {
   align-items: center;
 }
 .el-table {
-  width: 1450px!important;
+  width: 100%;
 }
 .bottom_wrapper {
   margin-top: 50px;
@@ -494,102 +404,8 @@ export default {
   display: flex;
   justify-content: flex-end;
 }
-.vue-print {
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-}
 @page {
   margin-top: 1mm;
   margin-bottom: 1mm;
-}
-.vuePrintStyle {
-  width: 8cm;
-  height: 4.5cm;
-}
-.barcode_style {
-  height: 30px;
-  line-height: 30px;
-}
-.print_area {
-  width: 12cm!important;
-  flex-direction: column;
-}
-.barcode_item {
-  line-height: 30px;
-}
-.font_style {
-  font-size: 14px;
-  text-align: left;
-}
-.printButton {
-  width: 100%;
-  height: 40px!important;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-.printCard {
-  height: 550px;
-}
-.barView {
-  width: 100%;
-  height: 400px;
-}
-.settingPanel {
-  margin-top: 20px;
-  width: 100%;
-  height: 200px!important;
-  display: flex;
-  justify-content: flex-start;
-  overflow: hidden;
-}
-.pubFontSty {
-  font-size: 15px;
-  font-weight: 500;
-}
-.gridContent {
-  display: flex;
-  margin-left: 10px;
-  margin-top: -70px;
-  height: 175px!important;
-  align-items: center;
-}
-.gridContent input {
-  width: 150px;
-  height: 25px;
-  outline: none;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: "Microsoft soft";
-}
-.barcode_wrapper {
-  width: 7cm;
-  height: 4.5cm;
-  display: flex;
-}
-.barcode_left {
-  display: flex;
-  flex-direction: column;
-}
-.barcodeContent {
-  display: flex;
-  flex-direction: column;
-}
-.barcodeSame {
-  height: 80px;
-}
-.anotherStyle {
-  margin-top: 10px;
-}
-.barcodeDiscription {
-  font-size: 20px;
-  margin-left: 10px;
-}
-.qrcode_style {
-  margin-left: 10px;
-  margin-top: 20px;
 }
 </style>

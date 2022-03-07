@@ -54,3 +54,18 @@ body {
     -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(84, 171, 241, 0.918);
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgba(84, 171, 241, 0.918);
 } */
+
+
+/* 去除浏览器默认滚动条 */
+
+
+/* .el-table .cell {
+    white-space: nowrap;
+} */
+
+.el-dialog .el-dialog__body {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    /* align-items: center; */
+}
