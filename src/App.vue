@@ -4,6 +4,7 @@
     class="isShow"
     :class="{ isBlock: isBlock }"
     v-loading.fullscreen.lock="fullscreenLoading"
+    v-cloak
   >
     <router-view />
   </div>
@@ -35,6 +36,9 @@ export default {
   display: block;
 }
 ::-webkit-scrollbar {
+  display: none;
+}
+[v-cloak] {
   display: none;
 }
 </style>

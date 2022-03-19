@@ -98,12 +98,20 @@
       </el-main>
       <el-footer :style="footer_style"><Footer /></el-footer>
     </el-container>
-    <PrintDialog v-if="isVisible" @childVisible="parentVisible" :print_review_info="this.print_review_info" />
+    <PrintDialog
+      v-if="isVisible"
+      @childVisible="parentVisible"
+      :print_review_info="this.print_review_info"
+    />
   </div>
 </template>
 
 <script>
+import PrintDialog from "../views/printDialog.vue";
 export default {
+  components: {
+    PrintDialog,
+  },
   created() {},
   data() {
     //   header
@@ -295,28 +303,6 @@ export default {
               duration: 2000,
             });
             this.data_list.inputValue = "";
-          } else if (status == 403) {
-            this.isAlign = true;
-            if (document.getElementsByClassName("el-message").length > 1)
-              return;
-            this.showEmpty = res.data.showEmpty;
-            this.tableShow = res.data.tableShow;
-            this.showPrint = res.data.showPrint;
-            this.print_review_info = "";
-            this.$message({
-              message: `<strong><i>输入类型无法预知错误...</i></strong>`,
-              // html元素
-              dangerouslyUseHTMLString: true,
-              // 关闭按钮开启d
-              showClose: true,
-              // 问名字是否居中
-              center: true,
-              // 文字提示类型
-              type: "error",
-              // 显示时间
-              duration: 2000,
-            });
-            this.data_list.inputValue = "";
           }
         });
     },
@@ -403,9 +389,5 @@ export default {
   width: 1600px;
   display: flex;
   justify-content: flex-end;
-}
-@page {
-  margin-top: 1mm;
-  margin-bottom: 1mm;
 }
 </style>

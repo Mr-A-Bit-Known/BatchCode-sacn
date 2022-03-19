@@ -10,9 +10,13 @@ import '../src/assets/style.css'
 import print from 'vue-print-nb'
 import VueBarcode from "vue-barcode"
 import QrcodeVue from 'qrcode.vue'
+import '../src/public/getViewSize'
+
+import Directives from '../src/directives/index'
+Vue.use(Directives)
 
 import Footer from '../src/views/Footer'
-import PrintDialog from '../src/views/printDialog'
+import Header from '../src/views/Header'
 
 Vue.use(print);
 Vue.config.productionTip = false;
@@ -22,21 +26,13 @@ Vue.use(ElementUI);
 Vue.component("barcode", VueBarcode);
 Vue.component("qrcode", QrcodeVue);
 Vue.component('Footer', Footer);
-Vue.component('PrintDialog', PrintDialog);
+Vue.component('Header', Header);
+
 Vue.prototype.$axios = axios;
 
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 
-// Global width & height auto achieveible
-Vue.prototype.$getViewSize = function() {
-    return {
-        width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth, // width
-        height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight // height
-    }
-}
-
-// 条形码样式
 
 /* eslint-disable no-new */
 new Vue({

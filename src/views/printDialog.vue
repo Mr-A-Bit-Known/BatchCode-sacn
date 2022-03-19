@@ -8,18 +8,7 @@
         :close-on-click-modal="noShowing"
         class="dialogStyle"
       >
-        <div
-          class="printWrapper"
-          id="printContent"
-          v-for="item in this.print_review_info"
-          :key="item.index"
-        >
-          <barcode :value="item.BatchCode" />
-          <barcode :value="item.WorkOrderCode" />
-        </div>
-        <div class="infoSetting">
-          <input type="text" v-model="this.modelInfo.BatchCode" />
-        </div>
+        <printCanvas id="printContent" :modelInfo="this.modelInfo"></printCanvas>
         <div class="bottomButton">
           <el-button
             type="primary"
@@ -34,12 +23,13 @@
 </template>
 
 <script>
+import printCanvas from "../views/printCanvas.vue";
 export default {
-  created() {
-    for (const item of this.print_review_info) {
-      this.modelInfo = item;
-    }
+  components: {
+    printCanvas,
   },
+  // 页面创建时...
+  created() {},
   data() {
     return {
       dialogTableVisible: true,
@@ -47,9 +37,20 @@ export default {
       noShowing: false,
       //   遍历父传子对象数组
       modelInfo: [],
+      // 条形码样式
+      barcode_option: {
+        displayValue: false,
+        // width: "2px",
+        height: 30,
+      },
     };
   },
   props: ["print_review_info"],
+  mounted() {
+    for (const item of this.print_review_info) {
+      this.modelInfo = item;
+    }
+  },
   //   状态是否可见
   methods: {
     //   子传父组件
@@ -62,7 +63,7 @@ export default {
 
 <style scoped>
 .printWrapper {
-  width: 100%;
+  width: 7cm;
   height: 100%;
   border: 1px solid black;
 }
@@ -70,5 +71,20 @@ export default {
   display: flex;
   justify-content: flex-end;
   margin-top: 15px;
+}
+.infoSetting {
+  display: flex;
+  margin-top: 15px;
+}
+.inputStyle {
+  outline: none;
+}
+.printWrapper >>> .vue-barcode-element {
+  width: 120px;
+  height: 25px;
+}
+@page{
+  margin: 0;
+  padding: 0;
 }
 </style>
